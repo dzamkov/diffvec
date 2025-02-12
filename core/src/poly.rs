@@ -1,7 +1,9 @@
 #![allow(clippy::type_complexity)]
-use crate::diff::Diff;
-use crate::map::*;
 use crate::vector::*;
+use crate::scalar::*;
+use crate::zero::*;
+use crate::map::*;
+use crate::diff::Diff;
 
 /// A [`Mappable`] where the components of a linear map correspond to terms in a polynomial. This
 /// induces a notion of multiplication between maps, implemented by combining terms and multiplying

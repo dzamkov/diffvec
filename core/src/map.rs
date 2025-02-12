@@ -1,3 +1,4 @@
+use crate::scalar::*;
 use crate::vector::*;
 
 /// A [`Vector`] which can be interpreted as a linear map from one vector type to another.
@@ -178,52 +179,6 @@ pub fn transpose_2<A: Mappable, B: Mappable, C: Mappable, D: Vector>(
         map,
         transpose::<B, C, D>,
     ))
-}
-
-impl<T: Vector> LinearMap<Scalar> for T {
-    type Out = T;
-
-    #[inline]
-    fn eval_inplace<Accum>(
-        &self,
-        input: &Scalar,
-        accum: &mut Accum,
-        f: impl Copy + Fn(&Self::Out, Scalar, &mut Accum),
-    ) {
-        f(self, *input, accum)
-    }
-}
-
-impl MappableBase for Scalar {
-    type Map<Out: Vector> = Out;
-}
-
-impl Mappable for Scalar {
-    #[inline]
-    fn map_new<Out: Vector>(f: impl Copy + Fn(&Self) -> Out) -> Map<Self, Out> {
-        f(&1.0)
-    }
-
-    #[inline]
-    fn map_identity() -> Map<Self, Self> {
-        1.0
-    }
-
-    #[inline]
-    fn map_transpose<Other: Mappable, Out: Vector>(
-        source: &Map<Other, Map<Self, Out>>,
-    ) -> Map<Self, Map<Other, Out>> {
-        *source
-    }
-
-    #[inline]
-    fn map_linear_inplace<A: Vector, B: Vector>(
-        map: &Map<Self, A>,
-        target: &mut Map<Self, B>,
-        f: impl Copy + Fn(&A, &mut B),
-    ) {
-        f(map, target)
-    }
 }
 
 unsafe impl<In: MappableBase<Map<T::Out> = T> + ContiguousVector, T: LinearMap<In>>
