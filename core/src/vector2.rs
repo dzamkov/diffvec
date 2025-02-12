@@ -1,8 +1,8 @@
-use crate::vector::*;
-use crate::scalar::*;
-use crate::map::*;
 use crate::diff::*;
+use crate::map::*;
 use crate::poly::*;
+use crate::scalar::*;
+use crate::vector::*;
 
 /// Shortcut for constructing a vector from its components.
 #[inline(always)]
@@ -133,6 +133,51 @@ where
     }
 }
 
+/// A 2-by-2 matrix, i.e. a linear map from a [`Vector2`] to a [`Vector2`].
+pub type Matrix2 = Vector2Map<Vector2>;
+
+impl Matrix2 {
+    /// The identity [`Matrix2`].
+    #[inline]
+    pub const fn identity() -> Self {
+        Self {
+            x: vec2(1.0, 0.0),
+            y: vec2(0.0, 1.0),
+        }
+    }
+
+    /// Computes the inverse of this [`Matrix2`].
+    #[inline]
+    pub fn inverse(&self) -> Self {
+        let det = self.x.x * self.y.y - self.x.y * self.y.x;
+        Self {
+            x: vec2(self.y.y, -self.x.y) / det,
+            y: vec2(-self.y.x, self.x.x) / det,
+        }
+    }
+}
+
+impl core::ops::Mul<Vector2> for Matrix2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn mul(self, rhs: Vector2) -> Self::Output {
+        self.eval(&rhs)
+    }
+}
+
+impl core::ops::Mul<Matrix2> for Matrix2 {
+    type Output = Matrix2;
+
+    #[inline]
+    fn mul(self, rhs: Matrix2) -> Self::Output {
+        Matrix2 {
+            x: self * rhs.x,
+            y: self * rhs.y,
+        }
+    }
+}
+
 /// A [`LinearMap`] from a [`Vector2`] to some vector type.
 #[repr(C)]
 #[derive(
@@ -150,7 +195,9 @@ where
 pub struct Vector2Map<Out: Vector> {
     pub x: Out,
     pub y: Out,
-}impl<Out: Vector> Vector2Map<Out> {
+}
+
+impl<Out: Vector> Vector2Map<Out> {
     /// Constructs a linear map with the given coefficients for each component.
     #[inline]
     pub const fn new(x: Out, y: Out) -> Self {
@@ -164,48 +211,6 @@ pub struct Vector2Map<Out: Vector> {
         y: Diff<Poly, Out>,
     ) -> Diff<Poly, Self> {
         x.map_linear(|x| Self::new(*x, Out::zero())) + y.map_linear(|y| Self::new(Out::zero(), *y))
-    }
-}
-
-impl Vector2Map<Vector2> {
-    /// Constructs a linear map which returns its input vector unchanged.
-    #[inline]
-    pub const fn identity() -> Self {
-        Self {
-            x: vec2(1.0, 0.0),
-            y: vec2(0.0, 1.0),
-        }
-    }
-
-    /// Interpreting this map as a 2x2 matrix, computes the inverse matrix.
-    #[inline]
-    pub fn inverse(&self) -> Self {
-        let det = self.x.x * self.y.y - self.x.y * self.y.x;
-        Self {
-            x: vec2(self.y.y, -self.x.y) / det,
-            y: vec2(-self.y.x, self.x.x) / det,
-        }
-    }
-}
-
-impl core::ops::Mul<Vector2> for Vector2Map<Vector2> {
-    type Output = Vector2;
-
-    #[inline]
-    fn mul(self, rhs: Vector2) -> Self::Output {
-        self.eval(&rhs)
-    }
-}
-
-impl core::ops::Mul<Vector2Map<Vector2>> for Vector2Map<Vector2> {
-    type Output = Vector2Map<Vector2>;
-
-    #[inline]
-    fn mul(self, rhs: Vector2Map<Vector2>) -> Self::Output {
-        Vector2Map {
-            x: self * rhs.x,
-            y: self * rhs.y,
-        }
     }
 }
 
