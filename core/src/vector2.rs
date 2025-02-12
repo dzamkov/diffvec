@@ -170,6 +170,15 @@ impl Matrix2 {
         }
     }
 
+    /// Computes the transpose of this [`Matrix2`].
+    #[inline]
+    pub fn transpose(&self) -> Self {
+        Self {
+            x: vec2(self.x.x, self.y.x),
+            y: vec2(self.x.y, self.y.y),
+        }
+    }
+
     /// Computes the inverse of this [`Matrix2`].
     #[inline]
     pub fn inverse(&self) -> Self {
@@ -285,11 +294,7 @@ impl<Poly: PolyMappable> Diff<Poly, Vector2> {
     /// The squared L2 norm of this vector.
     #[inline]
     pub fn norm_squared(&self) -> Diff<Poly, Scalar> {
-        Diff {
-            value: Vector2::dot(&self.value, &self.value),
-            poly: Poly::map_compose::<Vector2, _>(&self.poly, &self.value) * 2.0
-                + Poly::poly_mul(&self.poly, &self.poly, Vector2::dot),
-        }
+        self.dot(self)
     }
 
     /// The L2 norm of this vector.
