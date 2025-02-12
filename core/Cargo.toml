@@ -1,0 +1,14 @@
+[package]
+name = "diffvec"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diffvec-derive = { path = "../derive" }
+serdere = { git = "https://github.com/dzamkov/serdere" }
+approx = "0.5"
+arrayvec = "0.7"
+rand = "0.9"
+
+[dev-dependencies]
+astro-float = "0.9"
