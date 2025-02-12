@@ -5,10 +5,14 @@ edition = "2021"
 
 [dependencies]
 diffvec-derive = { path = "../derive" }
-serdere = { git = "https://github.com/dzamkov/serdere" }
+serdere = { git = "https://github.com/dzamkov/serdere", optional = true }
+bytemuck = { version = "1", optional = true }
 approx = "0.5"
 arrayvec = "0.7"
-rand = "0.9"
 
 [dev-dependencies]
 astro-float = "0.9"
+
+[features]
+serdere = ["dep:serdere"]
+bytemuck = ["dep:bytemuck"]

@@ -70,6 +70,30 @@ impl Vector2 {
     }
 }
 
+#[test]
+fn test_in_ccw_order() {
+    assert!(Vector2::in_ccw_order(
+        &vec2(1.0, 0.0),
+        &vec2(0.0, 1.0),
+        &vec2(-1.0, 0.0)
+    ));
+    assert!(!Vector2::in_ccw_order(
+        &vec2(1.0, 0.0),
+        &vec2(0.0, -1.0),
+        &vec2(-1.0, 0.0)
+    ));
+    assert!(Vector2::in_ccw_order(
+        &vec2(1.0, -1.0),
+        &vec2(0.0, 1.0),
+        &vec2(-1.0, 1.0)
+    ));
+    assert!(!Vector2::in_ccw_order(
+        &vec2(1.0, 0.0),
+        &vec2(1.0, 0.0),
+        &vec2(0.0, 1.0)
+    ));
+}
+
 impl From<[Scalar; 2]> for Vector2 {
     #[inline]
     fn from(source: [Scalar; 2]) -> Self {
@@ -181,17 +205,9 @@ impl core::ops::Mul<Matrix2> for Matrix2 {
 /// A [`LinearMap`] from a [`Vector2`] to some vector type.
 #[repr(C)]
 #[derive(
-    PartialEq,
-    Eq,
-    Default,
-    Clone,
-    Copy,
-    crate::Differentiate,
-    crate::Vector,
-    crate::Mappable,
-    serdere::Serialize,
-    serdere::Deserialize,
+    PartialEq, Eq, Default, Clone, Copy, crate::Differentiate, crate::Vector, crate::Mappable,
 )]
+#[cfg_attr(feature = "serdere", derive(serdere::Serialize, serdere::Deserialize))]
 pub struct Vector2Map<Out: Vector> {
     pub x: Out,
     pub y: Out,
@@ -220,28 +236,22 @@ impl<Out: Vector + std::fmt::Debug> std::fmt::Debug for Vector2Map<Out> {
     }
 }
 
+#[cfg(feature = "bytemuck")]
+unsafe impl<Out: Vector + bytemuck::Zeroable> bytemuck::Zeroable for Vector2Map<Out> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<Out: ContiguousVector + bytemuck::Zeroable + 'static> bytemuck::Pod
+    for Vector2Map<Out>
+{
+}
+
 #[test]
-fn test_in_ccw_order() {
-    assert!(Vector2::in_ccw_order(
-        &vec2(1.0, 0.0),
-        &vec2(0.0, 1.0),
-        &vec2(-1.0, 0.0)
-    ));
-    assert!(!Vector2::in_ccw_order(
-        &vec2(1.0, 0.0),
-        &vec2(0.0, -1.0),
-        &vec2(-1.0, 0.0)
-    ));
-    assert!(Vector2::in_ccw_order(
-        &vec2(1.0, -1.0),
-        &vec2(0.0, 1.0),
-        &vec2(-1.0, 1.0)
-    ));
-    assert!(!Vector2::in_ccw_order(
-        &vec2(1.0, 0.0),
-        &vec2(1.0, 0.0),
-        &vec2(0.0, 1.0)
-    ));
+#[cfg(feature = "bytemuck")]
+fn test_repr() {
+    let values: [f32; 4] = [1.0, 2.0, 3.0, 4.0];
+    let mat: Matrix2 = bytemuck::cast(values);
+    assert_eq!(mat.x, vec2(1.0, 2.0));
+    assert_eq!(mat.y, vec2(3.0, 4.0));
 }
 
 impl<Poly: PolyMappable> Diff<Poly, Vector2> {
