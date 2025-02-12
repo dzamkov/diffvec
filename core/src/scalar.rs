@@ -11,7 +11,7 @@ pub type Scalar = f32;
 pub const PI: Scalar = std::f32::consts::PI;
 
 impl crate::diff::Differentiate<Scalar> for Scalar {
-    fn perturb(&mut self, amount: &Scalar) {
+    fn perturb_mut(&mut self, amount: &Scalar) {
         *self += *amount
     }
 }

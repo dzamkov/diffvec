@@ -4,8 +4,15 @@ use core::ops::{Add, Mul, Sub};
 /// A type for which "small" changes can be described using a vector of type `D`, i.e. the type
 /// forms a [Differentiable manifold](https://en.wikipedia.org/wiki/Differentiable_manifold).
 pub trait Differentiate<D: Vector>: Clone {
+    /// Gets this value with a "small" change applied to it.
+    fn perturb(&self, amount: &D) -> Self {
+        let mut res = self.clone();
+        res.perturb_mut(amount);
+        res
+    }
+
     /// Applies a "small" change to this value.
-    fn perturb(&mut self, amount: &D);
+    fn perturb_mut(&mut self, amount: &D);
 }
 
 /// A [`Diff`] wrapper around a constant value, with the approximation polynomial set to always
@@ -163,9 +170,7 @@ impl<Poly: PolyMappable, Out: Differentiate<DOut>, DOut: Vector> Diff<Poly, Out,
     where
         Poly: PolyRelation<DIn>,
     {
-        let mut value = self.value.clone();
-        value.perturb(&Poly::poly_eval(&self.poly, d_in));
-        value
+        self.value.perturb(&Poly::poly_eval(&self.poly, d_in))
     }
 
     /// "Shifts" this approximation by the given differential input.
@@ -239,14 +244,13 @@ impl<Poly: PolyMappable, Out: Vector> Diff<Poly, Out> {
     ) -> Diff<Poly, NOut, NDOut> {
         let Diff { mut value, poly } = diff;
         let p = Other::poly_chain::<Poly, NDOut>(self, &poly);
-        value.perturb(&p.value);
+        value.perturb_mut(&p.value);
         Diff {
             value,
             poly: p.poly,
         }
     }
 
-    
     /// Applies this linear map to the given input.
     #[inline]
     pub fn eval<In: Vector>(&self, input: &Diff<Poly, In>) -> Diff<Poly, Out::Out>

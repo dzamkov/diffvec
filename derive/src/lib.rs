@@ -45,13 +45,13 @@ fn expand_differentiate(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     let body = fields
         .members()
         .map(|member| {
-            quote! { self.#member.perturb(&rhs.#member); }
+            quote! { self.#member.perturb_mut(&rhs.#member); }
         })
         .collect::<TokenStream>();
     Ok(quote! {
         #[automatically_derived]
         impl #impl_generics #diffvec::Differentiate<Self> for #ident #ty_generics #where_clause {
-            fn perturb(&mut self, rhs: &Self) {
+            fn perturb_mut(&mut self, rhs: &Self) {
                 #body
             }
         }

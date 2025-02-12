@@ -84,7 +84,7 @@ impl<Out: Vector> Mul<Scalar> for ZeroMap<Out> {
 
 impl<Out: Vector> crate::diff::Differentiate<ZeroMap<Out>> for ZeroMap<Out> {
     #[inline]
-    fn perturb(&mut self, _: &ZeroMap<Out>) {
+    fn perturb_mut(&mut self, _: &ZeroMap<Out>) {
         // Nothing to do here
     }
 }

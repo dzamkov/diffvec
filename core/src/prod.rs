@@ -52,9 +52,9 @@ impl<DA: Vector, DB: Vector, A: Differentiate<DA>, B: Differentiate<DB>>
     Differentiate<Prod2<DA, DB>> for Prod2<A, B>
 {
     #[inline]
-    fn perturb(&mut self, amount: &Prod2<DA, DB>) {
-        self.0.perturb(&amount.0);
-        self.1.perturb(&amount.1);
+    fn perturb_mut(&mut self, amount: &Prod2<DA, DB>) {
+        self.0.perturb_mut(&amount.0);
+        self.1.perturb_mut(&amount.1);
     }
 }
 
@@ -104,9 +104,9 @@ impl<
     > Differentiate<Prod3<DA, DB, DC>> for Prod3<A, B, C>
 {
     #[inline]
-    fn perturb(&mut self, amount: &Prod3<DA, DB, DC>) {
-        self.0.perturb(&amount.0);
-        self.1.perturb(&amount.1);
-        self.2.perturb(&amount.2);
+    fn perturb_mut(&mut self, amount: &Prod3<DA, DB, DC>) {
+        self.0.perturb_mut(&amount.0);
+        self.1.perturb_mut(&amount.1);
+        self.2.perturb_mut(&amount.2);
     }
 }
