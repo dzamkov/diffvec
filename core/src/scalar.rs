@@ -1,8 +1,8 @@
+use crate::diff::*;
 use crate::map::*;
+use crate::poly::*;
 use crate::vector::*;
 use crate::vector2::*;
-use crate::poly::*;
-use crate::diff::*;
 
 /// A scalar value.
 pub type Scalar = f32;
@@ -10,9 +10,15 @@ pub type Scalar = f32;
 /// Archimedes' constant (π).
 pub const PI: Scalar = std::f32::consts::PI;
 
-impl crate::diff::Differentiate<Scalar> for Scalar {
+impl Differentiate<Scalar> for Scalar {
     fn perturb_mut(&mut self, amount: &Scalar) {
         *self += *amount
+    }
+}
+
+impl Differentiate<Scalar> for f64 {
+    fn perturb_mut(&mut self, amount: &f32) {
+        *self += *amount as f64
     }
 }
 
